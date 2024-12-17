@@ -21,14 +21,8 @@ const authMiddleware = (allowedRoles) => {
       // Role-based access control
       const role = decoded.role;
 
-      // Admin has access to everything
-      if (role === "admin") {
-        req.user = { id: decoded.id, role: decoded.role };
-        return next();
-      }
-
       // Check if the user's role is in the allowedRoles
-      
+
       if (allowedRoles.includes(role)) {
         req.user = { id: decoded.id, role: decoded.role };
         return next();
