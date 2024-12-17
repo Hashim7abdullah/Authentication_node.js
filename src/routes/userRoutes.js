@@ -10,6 +10,5 @@ const userRouter = express.Router();
 userRouter.post("/register", register);
 userRouter.post("/login", login);
 
-// Protected route example
 
 export default userRouter;

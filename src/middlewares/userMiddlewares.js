@@ -1,53 +1,51 @@
- //auth middleware
+import jwt from "jsonwebtoken";
 
-  // Middleware for session-based authentication
-  // authMiddleware - using Authorization header instead of session token
-const authMiddleware = (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1]; // Get token from 'Authorization' header
-  
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = {
-          id: decoded.id,
-          role: decoded.role,
-        };
-        next();
-      } catch (error) {
+// Middleware for authentication and role-based authorization
+const authMiddleware = (allowedRoles) => {
+  return (req, res, next) => {
+    try {
+      // Get token from cookies or Authorization header
+      const token =
+        req.cookies.token || req.header("Authorization")?.split(" ")[1];
+
+      if (!token) {
         return res.status(401).json({
           success: false,
-          message: 'Authentication failed. Please log in again.',
+          message: "No authentication token. Authorization denied.",
         });
       }
-    } else {
+
+      // Verify and decode the token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      // Role-based access control
+      const role = decoded.role;
+
+      // Admin has access to everything
+      if (role === "admin") {
+        req.user = { id: decoded.id, role: decoded.role };
+        return next();
+      }
+
+      // Check if the user's role is in the allowedRoles
+      
+      if (allowedRoles.includes(role)) {
+        req.user = { id: decoded.id, role: decoded.role };
+        return next();
+      }
+
+      // If the role doesn't match
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You do not have the required role.",
+      });
+    } catch (error) {
       return res.status(401).json({
         success: false,
-        message: 'No authentication token. Authorization denied.',
+        message: "Authentication failed. Please log in again.",
       });
     }
   };
-  
+};
 
-
-//role middleware
-
-const roleMiddleware = (allowedRoles) => {
-    return (req, res, next) => {
-      // First, use the existing authentication middleware
-      authMiddleware(req, res, () => {
-        // Check if user role is in the allowed roles
-        if (!allowedRoles.includes(req.user.role)) {
-          return res.status(403).json({
-            success: false,
-            message: 'Access denied. Insufficient permissions.'
-          });
-        }
-        next();
-      });
-    };
-  };
-
-
- 
-
-  export {roleMiddleware , authMiddleware}
+export default authMiddleware;
