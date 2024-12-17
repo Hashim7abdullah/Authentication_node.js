@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose";
 import session from "express-session";
 import MongoStore from "connect-mongo";
+import cookieParser from "cookie-parser";
 
 // Import routes
 import userRouter from "./src/routes/userRoutes.js";
@@ -17,6 +17,11 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser())
+
+ // Routes
+ app.use("/api/auth", userRouter);
+ app.use("/api/user", protectedRoutes);
 
 // Database Connection Function
 Dbconnection();
@@ -26,7 +31,7 @@ const setupSessionMiddleware = async () => {
   const mongoClient = await Dbconnection();
 
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'fallback_secret_key', // Ensure a secret is always provided
+    secret: process.env.SESSION_SECRET, // Ensure a secret is always provided
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -42,9 +47,7 @@ const setupSessionMiddleware = async () => {
     }
   }));
 
-  // Routes
-  app.use("/api/auth", userRouter);
-  app.use("/api/user", protectedRoutes);
+ 
 
   // Error handling middleware
   app.use((err, req, res, next) => {
