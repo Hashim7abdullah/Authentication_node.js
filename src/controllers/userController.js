@@ -2,17 +2,18 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userList.js";
 
-//register
+
+
+// Register Controller
 const register = async (req, res) => {
   try {
     const { email, name, password, role } = req.body;
 
     const existingUser = await userModel.findOne({ email });
-
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "User already exist",
+        message: "User already exists",
       });
     }
 
@@ -20,9 +21,10 @@ const register = async (req, res) => {
     if (existingName) {
       return res.status(400).json({
         success: false,
-        message: "Username already exist",
+        message: "Username already exists",
       });
     }
+
     if (password.length < 8) {
       return res.status(400).json({
         success: false,
@@ -30,29 +32,28 @@ const register = async (req, res) => {
       });
     }
 
-    const hashedpassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new userModel({
       name,
       email,
-      password: hashedpassword,
+      password: hashedPassword,
       role,
     });
 
     const user = await newUser.save();
 
-    return res
-      .status(201)
-      .json({ success: true, message: "User created succesfully" });
-    user: {
-      id: user._id;
-      name: user.name;
-      email: user.email;
-      password: user.password;
-    }
+    return res.status(201).json({ 
+      success: true, 
+      message: "User created successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
   } catch (error) {
-    console.log(error);
-
+    console.error(error);
     return res.status(500).json({
       success: false,
       message: error.message,
@@ -60,44 +61,74 @@ const register = async (req, res) => {
   }
 };
 
-//login
-
+// Login Controller
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Find user by email
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "User is not registered" });
+      return res.status(401).json({ 
+        success: false, 
+        message: "User is not registered" 
+      });
     }
+
+    // Validate password
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: "Invalid credentials"
       });
     }
+
+    // Create token
     const token = jwt.sign(
-      { id: user._id, role: user.role }, 
+      { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "2h",
-      }
+      { expiresIn: "2h" }
     );
-    res.cookie("token", token, { httpOnly: true, maxAge: 360000 });
-    return res.status(201).json({
+
+    // Store token in session
+    req.session.token = token;
+
+    return res.status(200).json({
       success: true,
-      message: "Login successfull",
+      message: "Login successful"
     });
   } catch (error) {
-    console.log(error);
-    return res.status(404).json({
+    console.error(error);
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message
     });
   }
 };
 
-export { register, login };
+// Logout Controller
+const logout = (req, res) => {
+  // Destroy the session
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({
+        success: false,
+        message: "Could not log out"
+      });
+    }
+    
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully"
+    });
+  });
+};
+
+
+
+export { 
+  register, 
+  login, 
+  logout, 
+};
