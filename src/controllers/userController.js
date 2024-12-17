@@ -2,8 +2,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import userModel from "../models/userList.js";
 
-
-
 // Register Controller
 const register = async (req, res) => {
   try {
@@ -43,14 +41,14 @@ const register = async (req, res) => {
 
     const user = await newUser.save();
 
-    return res.status(201).json({ 
-      success: true, 
+    return res.status(201).json({
+      success: true,
       message: "User created successfully",
       user: {
         id: user._id,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -69,9 +67,9 @@ const login = async (req, res) => {
     // Find user by email
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "User is not registered" 
+      return res.status(401).json({
+        success: false,
+        message: "User is not registered",
       });
     }
 
@@ -80,7 +78,7 @@ const login = async (req, res) => {
     if (!validPassword) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials"
+        message: "Invalid credentials",
       });
     }
 
@@ -90,45 +88,20 @@ const login = async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: "2h" }
     );
-
-    // Store token in session
-    req.session.token = token;
-
+    res.cookie("token", token, { httpOnly: true, maxAge: 360000 });
     return res.status(200).json({
       success: true,
-      message: "Login successful"
+      message: "Login successful",
     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
 
 // Logout Controller
-const logout = (req, res) => {
-  // Destroy the session
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Could not log out"
-      });
-    }
-    
-    return res.status(200).json({
-      success: true,
-      message: "Logged out successfully"
-    });
-  });
-};
 
-
-
-export { 
-  register, 
-  login, 
-  logout, 
-};
+export { register, login };
