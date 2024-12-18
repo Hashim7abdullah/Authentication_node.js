@@ -58,7 +58,7 @@ const Home = () => {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
+              {users.slice().reverse().map((user, index) => (
                 <tr
                   key={index}
                   className="hover:bg-gray-50 transition-colors duration-200 group"
