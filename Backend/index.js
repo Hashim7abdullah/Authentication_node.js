@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
+import cors from 'cors'
 
 // Import routes
 import userRouter from "./src/routes/userRoutes.js";
 import protectedRoutes from "./src/routes/protectedRoutes.js";
 import Dbconnection from "./src/config/database.js";
+import usersRoute from "./src/routes/dataRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -15,13 +17,16 @@ dotenv.config();
 // Create Express app
 const app = express();
 
+
 // Middleware
+app.use(cors())
 app.use(express.json());
 app.use(cookieParser())
 
  // Routes
  app.use("/api/auth", userRouter);
  app.use("/api/user", protectedRoutes);
+ app.use("/api/users", usersRoute);
 
 // Database Connection Function
 Dbconnection();
