@@ -75,7 +75,7 @@ const Home = () => {
                   <td className="p-2 sm:p-4 border-b border-gray-200">
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                       <Link
-                        to="/update"
+                        to={`/update/${user._id}`}
                         className="w-full sm:w-auto bg-blue-500 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md hover:bg-blue-600 transition-colors group-hover:scale-105 transform duration-200 shadow-md flex items-center justify-center space-x-1 text-xs sm:text-sm"
                       >
                         <svg
@@ -89,7 +89,7 @@ const Home = () => {
                         <span>Edit</span>
                       </Link>
                       <Link
-                        to="/delete"
+                        to={`/delete/${user._id}`}
                         className="w-full sm:w-auto bg-red-500 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md hover:bg-red-600 transition-colors group-hover:scale-105 transform duration-200 shadow-md flex items-center justify-center space-x-1 text-xs sm:text-sm"
                       >
                         <svg

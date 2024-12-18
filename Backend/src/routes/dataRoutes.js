@@ -1,10 +1,10 @@
 import express from "express";
-import { userData, fetchdata } from "../controllers/userData.js";
+import { userData, fetchdata, updateData } from "../controllers/userData.js";
 
 const usersRoute = express.Router();
 
 // Authentication routes
 usersRoute.post("/create-users", userData);
 usersRoute.get("/get-users", fetchdata);
-
+usersRoute.put("/update-users/:id", updateData);
 export default usersRoute;
