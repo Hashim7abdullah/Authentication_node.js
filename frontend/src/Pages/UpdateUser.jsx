@@ -1,10 +1,28 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UpdateUser = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("");
+  const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+    // Assuming you're passing the user ID from the route
+    const userId = window.location.pathname.split("/").pop();
+
+    axios
+      .put(`http://localhost:4000/api/users/update-users/${userId}`, {
+        name,
+        email,
+        role,
+      })
+      .then((result) => {
+        console.log(result);
+        navigate("/");
+      })
+      .catch((err) => console.log(err));
   };
   return (
     <div className="w-screen min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
@@ -43,8 +61,8 @@ const UpdateUser = () => {
               type="text"
               id="Name"
               name="Name"
-              // value={userData.Name}
-              // onChange={handleInputChange}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Enter full name"
@@ -62,8 +80,8 @@ const UpdateUser = () => {
               type="email"
               id="Email"
               name="Email"
-              // value={userData.Email}
-              // onChange={handleInputChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               placeholder="Enter email address"
@@ -81,8 +99,8 @@ const UpdateUser = () => {
               type="text"
               id="Role"
               name="Role"
-              // value={userData.Age}
-              // onChange={handleInputChange}
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
               required
               min="18"
               max="100"
