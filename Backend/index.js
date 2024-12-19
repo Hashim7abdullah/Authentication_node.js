@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
-import cors from 'cors'
+import cors from "cors";
 
 // Import routes
 import userRouter from "./src/routes/userRoutes.js";
@@ -17,16 +17,20 @@ dotenv.config();
 // Create Express app
 const app = express();
 
-
 // Middleware
-app.use(cors())
+app.use(
+  cors({
+    origin: "http://localhost:5174", // Frontend URL
+    credentials: true, // Allow credentials
+  })
+);
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
 
- // Routes
- app.use("/api/auth", userRouter);
- app.use("/api/user", protectedRoutes);
- app.use("/api/users", usersRoute);
+// Routes
+app.use("/api/auth", userRouter);
+app.use("/api/user", protectedRoutes);
+app.use("/api/users", usersRoute);
 
 // Database Connection Function
 Dbconnection();
@@ -35,31 +39,31 @@ Dbconnection();
 const setupSessionMiddleware = async () => {
   const mongoClient = await Dbconnection();
 
-  app.use(session({
-    secret: process.env.SESSION_SECRET, // Ensure a secret is always provided
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      client: mongoClient, // Use the MongoDB client directly
-      dbName: new URL(process.env.MONGODB_URI).pathname.substring(1), // Extract database name from URI
-      collectionName: 'sessions'
-    }),
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 2, // 2 hours
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      httpOnly: true, // Prevents client-side JS from accessing the cookie
-      sameSite: 'strict' // Added for additional security
-    }
-  }));
-
- 
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET, // Ensure a secret is always provided
+      resave: false,
+      saveUninitialized: false,
+      store: MongoStore.create({
+        client: mongoClient, // Use the MongoDB client directly
+        dbName: new URL(process.env.MONGODB_URI).pathname.substring(1), // Extract database name from URI
+        collectionName: "sessions",
+      }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 2, // 2 hours
+        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        httpOnly: true, // Prevents client-side JS from accessing the cookie
+        sameSite: "strict", // Added for additional security
+      },
+    })
+  );
 
   // Error handling middleware
   app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({
       success: false,
-      message: 'Something went wrong!'
+      message: "Something went wrong!",
     });
   });
 
@@ -79,20 +83,20 @@ const startServer = async () => {
     });
 
     // Handle unhandled promise rejections
-    process.on('unhandledRejection', (reason, promise) => {
-      console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.on("unhandledRejection", (reason, promise) => {
+      console.error("Unhandled Rejection at:", promise, "reason:", reason);
       // Gracefully shut down the server
       server.close(() => process.exit(1));
     });
 
     // Handle uncaught exceptions
-    process.on('uncaughtException', (error) => {
-      console.error('Uncaught Exception:', error);
+    process.on("uncaughtException", (error) => {
+      console.error("Uncaught Exception:", error);
       // Gracefully shut down the server
       server.close(() => process.exit(1));
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    console.error("Failed to start server:", error);
     process.exit(1);
   }
 };
