@@ -123,7 +123,7 @@ const CreateUser = () => {
                   clipRule="evenodd"
                 />
               </svg>
-              <span>Create User</span>
+              <span>Create New User</span>
             </button>
           </div>
         </form>
