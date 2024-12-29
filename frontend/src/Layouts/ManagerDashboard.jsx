@@ -9,7 +9,6 @@ function ManagerDashboard() {
   const navigate = useNavigate();
 
   const logout = () => {
-    // Implement logout logic, potentially clearing tokens
     navigate('/login');
   };
 
