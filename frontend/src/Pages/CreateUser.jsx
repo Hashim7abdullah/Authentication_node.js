@@ -44,7 +44,7 @@ const CreateUser = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <span>Back to List</span>
+            <span>Back</span>
           </Link>
         </div>
 
