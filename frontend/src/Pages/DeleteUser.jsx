@@ -23,7 +23,6 @@ const DeleteUser = () => {
   };
 
   const handleCancel = () => {
-    // Close modal and go back to home page
     setIsModalOpen(false);
     navigate('/');
   };
