@@ -27,7 +27,6 @@ const DeleteUser = () => {
     navigate('/');
   };
 
-  // If modal is closed, return null
   if (!isModalOpen) return null;
 
   return (
