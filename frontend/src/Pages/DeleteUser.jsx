@@ -17,7 +17,6 @@ const DeleteUser = () => {
       navigate('/');
     } catch (error) {
       console.error('Error deleting user:', error);
-      // Optionally, show an error message to the user
       alert('Failed to delete user. Please try again.');
     }
   };
